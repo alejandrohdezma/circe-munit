@@ -5,7 +5,7 @@ MUnit assertions for Circe codecs
 Add the following line to your build.sbt file:
 
 ```sbt
-libraryDependencies += "com.alejandrohdezma" %% "circe-munit" % "0.0.0" % Test
+libraryDependencies += "com.alejandrohdezma" %% "circe-munit" % "0.1.0" % Test
 ```
 
 ## Usage
