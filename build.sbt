@@ -1,5 +1,5 @@
-ThisBuild / scalaVersion           := "2.13.14"
-ThisBuild / crossScalaVersions     := Seq("2.13.14", "3.3.3")
+ThisBuild / scalaVersion           := "2.13.15"
+ThisBuild / crossScalaVersions     := Seq("2.13.15", "3.3.4")
 ThisBuild / organization           := "com.alejandrohdezma"
 ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
 
@@ -13,6 +13,6 @@ lazy val documentation = project
 
 lazy val `circe-munit` = module
   .settings(Test / fork := true)
-  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.0.1")
+  .settings(libraryDependencies += "org.scalameta" %% "munit" % "1.0.2")
   .settings(libraryDependencies += "io.circe" %% "circe-core" % "0.14.10")
   .settings(libraryDependencies += "dev.zio" %% "izumi-reflect" % "2.3.10")
