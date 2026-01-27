@@ -35,7 +35,7 @@ import io.circe.syntax._
   */
 class LogsSuite extends FunSuite {
 
-  private val thisFile = s"${sys.props("user.dir")}/src/test/scala/munit/LogsSuite.scala"
+  private val thisFile = "modules/circe-munit/src/test/scala/munit/LogsSuite.scala"
 
   test("Suite works as expected in Scala 2.13") {
     assume(!isScala3)
