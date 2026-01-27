@@ -44,9 +44,9 @@ class ExampleSuite extends CirceSuite {
 
   // We can use any type with a codec, encoder or decoder
 
-  case class Foo(i: Int, s: String)
+  private case class Foo(i: Int, s: String) // scalafix:ok
 
-  implicit val FooCodec: Codec[Foo] = Codec.forProduct2("i", "s")(Foo.apply)(foo => (foo.i, foo.s))
+  implicit private val FooCodec: Codec[Foo] = Codec.forProduct2("i", "s")(Foo.apply)(foo => (foo.i, foo.s))
 
   checkCodec(Foo(42, "foo")) {
     Json.obj("i" := 42, "s" := "foo")
@@ -54,9 +54,9 @@ class ExampleSuite extends CirceSuite {
 
   // If the type has type parameters, they will also appear on the test name
 
-  case class Bar[A, B](a: A, b: B)
+  private case class Bar[A, B](a: A, b: B) // scalafix:ok
 
-  implicit def BarCodec[A: Encoder: Decoder, B: Encoder: Decoder]: Codec[Bar[A, B]] =
+  implicit private def BarCodec[A: Encoder: Decoder, B: Encoder: Decoder]: Codec[Bar[A, B]] =
     Codec.forProduct2[Bar[A, B], A, B]("a", "b")(Bar(_, _))(bar => (bar.a, bar.b))
 
   // Test name for 👇🏼 will be: `Codec[Bar[Foo, Map[String, Int]]]`
