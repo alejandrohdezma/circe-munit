@@ -19,11 +19,29 @@ package munit
 import io.circe.ACursor
 import io.circe.Decoder
 import io.circe.Json
+import munit.diff.DiffOptions
 
 /** Syntax for working with `Json` values in tests. Mixed into `CirceSuite`; mix it into any other suite to use it
   * there.
   */
 trait CirceMUnitSyntax { self: Assertions =>
+
+  /** Makes `assertEquals` on two `Json` values honor the placeholders in the expected one. */
+  implicit def circeMUnitJsonCompare(implicit placeholders: Placeholders): Compare[Json, Json] =
+    new Compare[Json, Json] {
+
+      def isEqual(obtained: Json, expected: Json): Boolean =
+        Compare.defaultCompare[Json, Json].isEqual(obtained.withPlaceholders(expected), expected)
+
+      override def failEqualsComparison(obtained: Json, expected: Json, title: Any, assertions: Assertions)(implicit
+          loc: Location,
+          options: DiffOptions
+      ): Nothing =
+        Compare
+          .defaultCompare[Json, Json]
+          .failEqualsComparison(obtained.withPlaceholders(expected), expected, title, assertions)
+
+    }
 
   implicit final class CirceMUnitJsonOps(json: Json) {
 
@@ -49,6 +67,23 @@ trait CirceMUnitSyntax { self: Assertions =>
       if (!cursor.succeeded) None
       else cursor.as[A].fold(e => fail(s"Path ${path.mkString(".")} does not decode: ${e.getMessage}"), Some(_))
     }
+
+    /** `json` with every value that satisfies the placeholder at the same position in `expected` replaced by that
+      * placeholder's marker.
+      */
+    def withPlaceholders(expected: Json)(implicit placeholders: Placeholders): Json =
+      if (placeholders.find(expected).exists(_.matches(json)))
+        expected
+      else if (json.isObject && expected.isObject)
+        Json.fromFields(json.asObject.get.toList.map { case (key, value) =>
+          key -> expected.asObject.get(key).fold(value)(value.withPlaceholders)
+        })
+      else if (json.isArray && expected.isArray)
+        Json.fromValues {
+          json.asArray.get.zip(expected.asArray.get).map { case (value, expected) => value.withPlaceholders(expected) }
+        }
+      else
+        json
 
   }
 

@@ -67,6 +67,45 @@ class MySuite extends munit.CirceSuite {
 }
 ```
 
+### Asserting JSON values with placeholders
+
+On a `CirceSuite`, `assertEquals` on two JSON values accepts placeholders in the expected one for values that are not known in advance: an id the server generated, a timestamp of the request. Those are written as placeholders, strings that stand for any value they accept:
+
+```scala mdoc:compile-only
+import java.time.Instant
+import java.util.UUID
+
+import io.circe.Json
+import io.circe.syntax._
+
+class UsersSuite extends munit.CirceSuite {
+
+  test("a user is created") {
+    val obtained = Json.obj("id" := UUID.randomUUID(), "name" := "Jose", "created_at" := Instant.now())
+
+    val expected = Json.obj("id" := "<any>", "name" := "Jose", "created_at" := "<any>")
+
+    assertEquals(obtained, expected)
+  }
+
+}
+```
+
+On failure the diff shows the obtained value with every value that satisfied its placeholder replaced by the marker, so only the values that did not match are shown as they were received. A field missing from the expected value, or present in it but missing from the obtained one, fails like any other difference.
+
+One placeholder comes by default: `<any>` for any value. Add your own by putting a `Placeholders` value in scope:
+
+```scala mdoc:compile-only
+import munit.Placeholders
+
+implicit val placeholders: Placeholders =
+  Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
+```
+
+A placeholder can also be used with `:=` when building the expected value, through its `json` value: `"id" := Placeholder.uuid.json`.
+
+Placeholders and the syntax below are available on any `CirceSuite`. To use them on another suite, mix in `munit.CirceMUnitSyntax`.
+
 ### Reading JSON values by path
 
 When a single value is what matters, `apply` on a `Json` reads it by path and decodes it, failing the test when the path is missing or the value does not decode. `get` returns `None` instead when the path is missing:

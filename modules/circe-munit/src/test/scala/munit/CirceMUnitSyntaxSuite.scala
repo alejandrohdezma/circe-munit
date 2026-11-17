@@ -20,6 +20,7 @@ import java.time.Instant
 import java.util.UUID
 
 import io.circe.Json
+import io.circe.literal._
 import io.circe.syntax._
 
 class CirceMUnitSyntaxSuite extends FunSuite with CirceMUnitSyntax {
@@ -53,6 +54,89 @@ class CirceMUnitSyntaxSuite extends FunSuite with CirceMUnitSyntax {
   test("an optional value is read by its path") {
     assertEquals(obtained.get[String]("name"), Some("Jose"))
     assertEquals(obtained.get[String]("nested", "name"), None)
+  }
+
+  test("<any> stands for any value") {
+    val expected =
+      json"""{ "id": "<any>", "name": "<any>", "created_at": "<any>", "tags": "<any>", "nested": "<any>" }"""
+
+    assertEquals(obtained, expected)
+  }
+
+  test("placeholders apply at any depth") {
+    val expected = json"""{
+      "id": "<any>",
+      "name": "Jose",
+      "created_at": "<any>",
+      "tags": ["a", "<any>"],
+      "nested": { "id": "<any>" }
+    }"""
+
+    assertEquals(obtained, expected)
+  }
+
+  test("placeholders can be written with :=") {
+    val expected = Json.obj(
+      "id"         := Placeholder.any.json,
+      "name"       := "Jose",
+      "created_at" := Placeholder.any.json,
+      "tags"       := List("a", "b"),
+      "nested"     := Placeholder.any.json
+    )
+
+    assertEquals(obtained, expected)
+  }
+
+  test("placeholders can be extended") {
+    implicit val placeholders: Placeholders =
+      Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
+
+    val expected = json"""{ "name": "<any>", "count": "<positive>" }"""
+
+    val obtained = json"""{ "name": "Jose", "count": 3 }"""
+
+    assertEquals(obtained, expected)
+  }
+
+  test("an extended placeholder rejects what it does not accept") {
+    implicit val placeholders: Placeholders =
+      Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
+
+    val expected = json"""{ "count": "<positive>" }"""
+
+    val obtained = json"""{ "count": -1 }"""
+
+    intercept[ComparisonFailException](assertEquals(obtained, expected))
+  }
+
+  test("a value that does not satisfy its placeholder is reported as received") {
+    implicit val placeholders: Placeholders =
+      Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
+
+    val expected = json"""{ "name": "<positive>", "count": "<positive>" }"""
+
+    val obtained = json"""{ "name": "Jose", "count": 3 }"""
+
+    val failure = intercept[ComparisonFailException](assertEquals(obtained, expected))
+
+    assert(failure.getMessage.contains("""name -> "Jose""""))
+    assert(failure.getMessage.contains("""count -> "<positive>""""))
+  }
+
+  test("an unexpected field fails") {
+    val expected = json"""{ "id": "<any>", "name": "Jose" }"""
+
+    val obtained = json"""{ "id": 1, "name": "Jose", "extra": 1 }"""
+
+    intercept[ComparisonFailException](assertEquals(obtained, expected))
+  }
+
+  test("a missing field fails") {
+    val expected = json"""{ "id": "<any>", "name": "Jose" }"""
+
+    val obtained = json"""{ "name": "Jose" }"""
+
+    intercept[ComparisonFailException](assertEquals(obtained, expected))
   }
 
 }
