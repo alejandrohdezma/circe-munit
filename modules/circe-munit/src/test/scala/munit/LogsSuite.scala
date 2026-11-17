@@ -58,10 +58,10 @@ class LogsSuite extends FunSuite {
          |JObject(
          |  value = object[foo -> 42,bar -> 43]
          |)
-         |=> Diff (- obtained, + expected)
+         |=> Diff (- expected, + obtained)
          | JObject(
-         |-  value = object[foo -> 42,bar -> 43]
-         |+  value = object[bar -> 43]
+         |-  value = object[bar -> 43]
+         |+  value = object[foo -> 42,bar -> 43]
          | )
          |==> Success Decoder[Map[String, Int]] (Something)
          |==> Success Codec[LogsSuite::SimpleSuite.Foo]
@@ -90,10 +90,10 @@ class LogsSuite extends FunSuite {
          |JObject(
          |  value = object[foo -> 42,bar -> 43]
          |)
-         |=> Diff (- obtained, + expected)
+         |=> Diff (- expected, + obtained)
          | JObject(
-         |-  value = object[foo -> 42,bar -> 43]
-         |+  value = object[bar -> 43]
+         |-  value = object[bar -> 43]
+         |+  value = object[foo -> 42,bar -> 43]
          | )
          |==> Success Decoder[Map[String, Int]] (Something)
          |==> Success Codec[LogsSuite::SimpleSuite.Foo]
