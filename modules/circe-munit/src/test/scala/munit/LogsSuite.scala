@@ -154,7 +154,7 @@ object LogsSuite {
       Json.obj("foo" := 42, "bar" := 43)
     }
 
-    private case class Foo(i: Int, s: String) // scalafix:ok
+    private case class Foo(i: Int, s: String)
 
     implicit private val fooCodec: Codec[Foo] = Codec.forProduct2("i", "s")(Foo.apply)(foo => (foo.i, foo.s))
 
@@ -162,7 +162,7 @@ object LogsSuite {
       Json.obj("i" := 42, "s" := "foo")
     }
 
-    private case class Bar[A, B](a: A, b: B) // scalafix:ok
+    private case class Bar[A, B](a: A, b: B)
 
     implicit private def barCodec[A: Encoder: Decoder, B: Encoder: Decoder]: Codec[Bar[A, B]] =
       Codec.forProduct2[Bar[A, B], A, B]("a", "b")(Bar(_, _))(bar => (bar.a, bar.b))
