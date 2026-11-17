@@ -91,10 +91,12 @@ object Placeholder {
   */
 final case class Placeholders(all: List[Placeholder]) {
 
-  def +(placeholder: Placeholder): Placeholders = Placeholders(all :+ placeholder)
+  /** Adds a placeholder, replacing any existing one with the same marker. */
+  def +(placeholder: Placeholder): Placeholders =
+    Placeholders(all.filterNot(_.marker === placeholder.marker) :+ placeholder)
 
-  /** Adds a placeholder from its marker and predicate: `Placeholders.default + ("<positive>", _.as[Int].exists(_ >
-    * 0))`.
+  /** Adds a placeholder from its marker and predicate, replacing any existing one with the same marker:
+    * `Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))`.
     */
   def +(marker: String, matches: Json => Boolean): Placeholders = this + Placeholder(marker, matches)
 

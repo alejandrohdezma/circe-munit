@@ -113,6 +113,17 @@ implicit val placeholders: Placeholders =
   Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
 ```
 
+Adding a placeholder whose marker is already in the set replaces it, which is how you change what a default one accepts:
+
+```scala mdoc:compile-only
+import scala.concurrent.duration._
+
+import munit.Placeholder
+import munit.Placeholders
+
+implicit val placeholders: Placeholders = Placeholders.default + Placeholder.recentTimestamp(1.minute)
+```
+
 Or build a set from scratch, to recognise only the placeholders you list:
 
 ```scala mdoc:compile-only
