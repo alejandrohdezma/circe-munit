@@ -23,7 +23,7 @@ import io.circe.syntax._
 import izumi.reflect.Tag
 import izumi.reflect.macrortti.LightTypeTag
 
-trait CirceSuite extends FunSuite {
+trait CirceSuite extends FunSuite with CirceMUnitSyntax {
 
   /** Asserts that the given value can be encoded to the expected JSON and then decoded back to the original value.
     *

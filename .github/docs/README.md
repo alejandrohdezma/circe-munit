@@ -67,6 +67,27 @@ class MySuite extends munit.CirceSuite {
 }
 ```
 
+### Reading JSON values by path
+
+When a single value is what matters, `apply` on a `Json` reads it by path and decodes it, failing the test when the path is missing or the value does not decode. `get` returns `None` instead when the path is missing:
+
+```scala mdoc:compile-only
+import io.circe.Json
+import io.circe.syntax._
+
+class UsersSuite extends munit.CirceSuite {
+
+  test("a user is read") {
+    val user = Json.obj("name" := "Jose", "workspace" := Json.obj("id" := "42"))
+
+    assertEquals(user[String]("name"), "Jose")
+    assertEquals(user[String]("workspace", "id"), "42")
+    assertEquals(user.get[String]("deleted_at"), None)
+  }
+
+}
+```
+
 ## Contributors to this project 
 
 @CONTRIBUTORS_TABLE@
