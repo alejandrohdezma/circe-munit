@@ -44,7 +44,7 @@ class ExampleSuite extends CirceSuite {
 
   // We can use any type with a codec, encoder or decoder
 
-  private case class Foo(i: Int, s: String) // scalafix:ok
+  private case class Foo(i: Int, s: String)
 
   implicit private val FooCodec: Codec[Foo] = Codec.forProduct2("i", "s")(Foo.apply)(foo => (foo.i, foo.s))
 
@@ -54,7 +54,7 @@ class ExampleSuite extends CirceSuite {
 
   // If the type has type parameters, they will also appear on the test name
 
-  private case class Bar[A, B](a: A, b: B) // scalafix:ok
+  private case class Bar[A, B](a: A, b: B)
 
   implicit private def BarCodec[A: Encoder: Decoder, B: Encoder: Decoder]: Codec[Bar[A, B]] =
     Codec.forProduct2[Bar[A, B], A, B]("a", "b")(Bar(_, _))(bar => (bar.a, bar.b))
