@@ -83,7 +83,7 @@ class UsersSuite extends munit.CirceSuite {
   test("a user is created") {
     val obtained = Json.obj("id" := UUID.randomUUID(), "name" := "Jose", "created_at" := Instant.now())
 
-    val expected = Json.obj("id" := "<any>", "name" := "Jose", "created_at" := "<any>")
+    val expected = Json.obj("id" := "<uuid>", "name" := "Jose", "created_at" := "<recent timestamp>")
 
     assertEquals(obtained, expected)
   }
@@ -93,7 +93,18 @@ class UsersSuite extends munit.CirceSuite {
 
 On failure the diff shows the obtained value with every value that satisfied its placeholder replaced by the marker, so only the values that did not match are shown as they were received. A field missing from the expected value, or present in it but missing from the obtained one, fails like any other difference.
 
-One placeholder comes by default: `<any>` for any value. Add your own by putting a `Placeholders` value in scope:
+These placeholders come by default:
+
+| Placeholder | Accepts |
+| :--- | :--- |
+| `<any>` | any value |
+| `<string>`, `<number>`, `<boolean>`, `<object>`, `<array>` | any value of that type |
+| `<uuid>` | any UUID |
+| `<uri>` | any URI |
+| `<timestamp>` | any ISO-8601 instant |
+| `<recent timestamp>` | any instant within the last ten seconds |
+
+Add your own by putting a `Placeholders` value in scope:
 
 ```scala mdoc:compile-only
 import munit.Placeholders

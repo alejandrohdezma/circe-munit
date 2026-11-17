@@ -139,4 +139,51 @@ class CirceMUnitSyntaxSuite extends FunSuite with CirceMUnitSyntax {
     intercept[ComparisonFailException](assertEquals(obtained, expected))
   }
 
+  test("<string>, <number>, <boolean>, <object> and <array> stand for any value of their type") {
+    val obtained = json"""{ "s": "Jose", "n": 1.5, "b": true, "o": { "a": 1 }, "a": [1] }"""
+
+    assertEquals(
+      obtained,
+      json"""{ "s": "<string>", "n": "<number>", "b": "<boolean>", "o": "<object>", "a": "<array>" }"""
+    )
+
+    intercept[ComparisonFailException](
+      assertEquals(
+        obtained,
+        json"""{ "s": "<number>", "n": "<string>", "b": "<object>", "o": "<array>", "a": "<boolean>" }"""
+      )
+    )
+  }
+
+  test("<uri> stands for any URI") {
+    assertEquals(json"""{ "self": "https://example.com/users/1" }""", json"""{ "self": "<uri>" }""")
+
+    intercept[ComparisonFailException](assertEquals(json"""{ "self": "not a uri" }""", json"""{ "self": "<uri>" }"""))
+  }
+
+  test("<timestamp> stands for any instant") {
+    assertEquals(json"""{ "updated_at": "2000-01-01T00:00:00Z" }""", json"""{ "updated_at": "<timestamp>" }""")
+
+    intercept[ComparisonFailException](
+      assertEquals(json"""{ "updated_at": "yesterday" }""", json"""{ "updated_at": "<timestamp>" }""")
+    )
+  }
+
+  test("<uuid> stands for any UUID") {
+    assertEquals(
+      obtained,
+      json"""{ "id": "<uuid>", "name": "<any>", "created_at": "<any>", "tags": "<any>", "nested": "<any>" }"""
+    )
+
+    intercept[ComparisonFailException](assertEquals(json"""{ "id": "not-a-uuid" }""", json"""{ "id": "<uuid>" }"""))
+  }
+
+  test("<recent timestamp> stands for any instant within the last ten seconds") {
+    assertEquals(obtained, json"""{ "id": "<any>", "name": "<any>", "created_at": "<recent timestamp>", "tags": "<any>", "nested": "<any>" }""")
+
+    intercept[ComparisonFailException] {
+      assertEquals(json"""{ "created_at": "2000-01-01T00:00:00Z" }""", json"""{ "created_at": "<recent timestamp>" }""")
+    }
+  }
+
 }

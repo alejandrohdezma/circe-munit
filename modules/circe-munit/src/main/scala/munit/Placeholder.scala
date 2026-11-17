@@ -16,7 +16,13 @@
 
 package munit
 
-import cats.syntax.eq._
+import java.net.URI
+import java.time.Instant
+import java.util.UUID
+
+import scala.concurrent.duration._
+
+import cats.syntax.all._
 
 import io.circe.Json
 
@@ -25,7 +31,7 @@ import io.circe.Json
   * Placeholders are plain strings, so they can be written in `json"..."` literals as well as with `:=`:
   *
   * {{{
-  * json"""{ "id": "<any>", "name": "Jose" }"""
+  * json"""{ "id": "<uuid>", "created_at": "<recent timestamp>" }"""
   * }}}
   *
   * @param marker
@@ -44,6 +50,34 @@ object Placeholder {
 
   /** Any value. */
   val any: Placeholder = Placeholder("<any>", _ => true)
+
+  /** Any string. */
+  val string: Placeholder = Placeholder("<string>", _.isString)
+
+  /** Any number. */
+  val number: Placeholder = Placeholder("<number>", _.isNumber)
+
+  /** Any boolean. */
+  val boolean: Placeholder = Placeholder("<boolean>", _.isBoolean)
+
+  /** Any object. */
+  val `object`: Placeholder = Placeholder("<object>", _.isObject)
+
+  /** Any array. */
+  val array: Placeholder = Placeholder("<array>", _.isArray)
+
+  /** Any UUID. */
+  val uuid: Placeholder = Placeholder("<uuid>", _.as[UUID].isRight)
+
+  /** Any URI. */
+  val uri: Placeholder = Placeholder("<uri>", _.as[String].exists(s => Either.catchNonFatal(new URI(s)).isRight))
+
+  /** Any instant. */
+  val timestamp: Placeholder = Placeholder("<timestamp>", _.as[Instant].isRight)
+
+  /** Any instant within the last `within`. */
+  def recentTimestamp(within: FiniteDuration = 10.seconds): Placeholder =
+    Placeholder("<recent timestamp>", _.as[Instant].exists(_.isAfter(Instant.now().minusMillis(within.toMillis))))
 
 }
 
@@ -71,7 +105,10 @@ final case class Placeholders(all: List[Placeholder]) {
 object Placeholders {
 
   implicit val default: Placeholders = Placeholders(
-    List(Placeholder.any)
+    List(
+      Placeholder.any, Placeholder.string, Placeholder.number, Placeholder.boolean, Placeholder.`object`,
+      Placeholder.array, Placeholder.uuid, Placeholder.uri, Placeholder.timestamp, Placeholder.recentTimestamp()
+    )
   )
 
 }
