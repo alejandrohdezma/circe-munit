@@ -98,6 +98,14 @@ class CirceMUnitSyntaxSuite extends FunSuite with CirceMUnitSyntax {
     assertEquals(obtained, expected)
   }
 
+  test("placeholders can be built from scratch") {
+    implicit val placeholders: Placeholders = Placeholders(Placeholder.any)
+
+    assertEquals(json"""{ "id": 1 }""", json"""{ "id": "<any>" }""")
+
+    intercept[ComparisonFailException](assertEquals(json"""{ "id": 1 }""", json"""{ "id": "<number>" }"""))
+  }
+
   test("an extended placeholder rejects what it does not accept") {
     implicit val placeholders: Placeholders =
       Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))

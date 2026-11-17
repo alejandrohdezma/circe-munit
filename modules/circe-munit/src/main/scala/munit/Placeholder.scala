@@ -82,10 +82,12 @@ object Placeholder {
 }
 
 /** The placeholders `assertEquals` recognises when comparing two `Json` values. The default set is in scope on every
-  * suite; add to it with `+`:
+  * suite; add to it with `+`, or build a set from scratch:
   *
   * {{{
   * implicit val placeholders: Placeholders = Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
+  *
+  * implicit val placeholders: Placeholders = Placeholders(Placeholder.any, Placeholder.uuid)
   * }}}
   */
 final case class Placeholders(all: List[Placeholder]) {
@@ -104,11 +106,11 @@ final case class Placeholders(all: List[Placeholder]) {
 
 object Placeholders {
 
+  def apply(placeholders: Placeholder*): Placeholders = Placeholders(placeholders.toList)
+
   implicit val default: Placeholders = Placeholders(
-    List(
-      Placeholder.any, Placeholder.string, Placeholder.number, Placeholder.boolean, Placeholder.`object`,
-      Placeholder.array, Placeholder.uuid, Placeholder.uri, Placeholder.timestamp, Placeholder.recentTimestamp()
-    )
+    Placeholder.any, Placeholder.string, Placeholder.number, Placeholder.boolean, Placeholder.`object`,
+    Placeholder.array, Placeholder.uuid, Placeholder.uri, Placeholder.timestamp, Placeholder.recentTimestamp()
   )
 
 }

@@ -113,6 +113,15 @@ implicit val placeholders: Placeholders =
   Placeholders.default + ("<positive>", _.as[Int].exists(_ > 0))
 ```
 
+Or build a set from scratch, to recognise only the placeholders you list:
+
+```scala mdoc:compile-only
+import munit.Placeholder
+import munit.Placeholders
+
+implicit val placeholders: Placeholders = Placeholders(Placeholder.any, Placeholder.uuid)
+```
+
 A placeholder can also be used with `:=` when building the expected value, through its `json` value: `"id" := Placeholder.uuid.json`.
 
 Placeholders and the syntax below are available on any `CirceSuite`. To use them on another suite, mix in `munit.CirceMUnitSyntax`.
