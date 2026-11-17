@@ -77,11 +77,11 @@ class CirceMUnitSyntaxSuite extends FunSuite with CirceMUnitSyntax {
 
   test("placeholders can be written with :=") {
     val expected = Json.obj(
-      "id"         := Placeholder.any.json,
+      "id"         := Placeholder.any,
       "name"       := "Jose",
-      "created_at" := Placeholder.any.json,
+      "created_at" := Placeholder.any,
       "tags"       := List("a", "b"),
-      "nested"     := Placeholder.any.json
+      "nested"     := Placeholder.any
     )
 
     assertEquals(obtained, expected)

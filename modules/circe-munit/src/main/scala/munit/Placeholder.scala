@@ -24,6 +24,7 @@ import scala.concurrent.duration._
 
 import cats.syntax.all._
 
+import io.circe.Encoder
 import io.circe.Json
 
 /** A value that stands for any JSON value accepted by `matches` inside an expected JSON document.
@@ -39,14 +40,12 @@ import io.circe.Json
   * @param matches
   *   whether an obtained value is accepted
   */
-final case class Placeholder(marker: String, matches: Json => Boolean) {
-
-  /** The placeholder as a JSON value, for use with `:=` when building an expected document. */
-  val json: Json = Json.fromString(marker)
-
-}
+final case class Placeholder(marker: String, matches: Json => Boolean)
 
 object Placeholder {
+
+  /** Encodes a placeholder as its marker, so it can be used with `:=` when building an expected document. */
+  implicit val PlaceholderEncoder: Encoder[Placeholder] = Encoder.encodeString.contramap(_.marker)
 
   /** Any value. */
   val any: Placeholder = Placeholder("<any>", _ => true)

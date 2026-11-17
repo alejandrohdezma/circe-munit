@@ -122,7 +122,7 @@ import munit.Placeholders
 implicit val placeholders: Placeholders = Placeholders(Placeholder.any, Placeholder.uuid)
 ```
 
-A placeholder can also be used with `:=` when building the expected value, through its `json` value: `"id" := Placeholder.uuid.json`.
+A placeholder can also be used with `:=` when building the expected value: `"id" := Placeholder.uuid`.
 
 Placeholders and the syntax below are available on any `CirceSuite`. To use them on another suite, mix in `munit.CirceMUnitSyntax`.
 
