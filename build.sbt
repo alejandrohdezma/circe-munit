@@ -1,5 +1,5 @@
 ThisBuild / organization           := "com.alejandrohdezma"
-ThisBuild / versionPolicyIntention := Compatibility.BinaryCompatible
+ThisBuild / versionPolicyIntention := Compatibility.None
 
 addCommandAlias("ci-test", "fix --check; versionPolicyCheck; mdoc; +publishLocal; +test")
 addCommandAlias("ci-docs", "github; mdoc; headerCreateAll")
